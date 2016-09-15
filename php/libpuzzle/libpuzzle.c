@@ -120,25 +120,28 @@ PHP_MINFO_FUNCTION(libpuzzle)
 /* {{{ proto string puzzle_fill_cvec_from_file(string filename)
  * Creates a signature out of an image file */
 PHP_FUNCTION(puzzle_fill_cvec_from_file)
-{    
-    char *arg = NULL;
-    int arg_len;
+{   
+	zend_string *arg;
     PuzzleContext *context;
     PuzzleCvec cvec;
     
     context = &LIBPUZZLE_G(global_context);
     if (zend_parse_parameters(ZEND_NUM_ARGS() TSRMLS_CC,
-                              "s", &arg, &arg_len) == FAILURE ||
-        arg_len <= 0) {
+                              "S", &arg) == FAILURE ||
+        arg->len <= 0) {
         RETURN_FALSE;
     }
-    puzzle_init_cvec(context, &cvec);
-    if (puzzle_fill_cvec_from_file(context, &cvec, arg) != 0) {
-        puzzle_free_cvec(context, &cvec);
-        RETURN_FALSE;
-    }
-    RETVAL_STRINGL(cvec.vec, cvec.sizeof_vec, 1);
-    puzzle_free_cvec(context, &cvec);
+	else {
+	    puzzle_init_cvec(context, &cvec);
+	    if (puzzle_fill_cvec_from_file(context, &cvec, arg->val) != 0) {
+	        puzzle_free_cvec(context, &cvec);
+	        RETURN_FALSE;
+	    }
+		else {
+		    RETVAL_STRINGL(cvec.vec, cvec.sizeof_vec);
+		    puzzle_free_cvec(context, &cvec);
+		}
+	}
 }
 /* }}} */
 
@@ -146,22 +149,21 @@ PHP_FUNCTION(puzzle_fill_cvec_from_file)
  * Compress a signature to save storage space */
 PHP_FUNCTION(puzzle_compress_cvec)
 {    
-    char *arg = NULL;
-    int arg_len;
+    zend_string *arg;
     PuzzleContext *context;
     PuzzleCompressedCvec compressed_cvec;
     PuzzleCvec cvec;
     
     context = &LIBPUZZLE_G(global_context);
     if (zend_parse_parameters(ZEND_NUM_ARGS() TSRMLS_CC,
-                              "s", &arg, &arg_len) == FAILURE ||
-        arg_len <= 0) {
+                              "S", &arg) == FAILURE ||
+        arg->len <= 0) {
         RETURN_FALSE;
     }
     puzzle_init_compressed_cvec(context, &compressed_cvec);
     puzzle_init_cvec(context, &cvec);
-    cvec.vec = arg;
-    cvec.sizeof_vec = (size_t) arg_len;    
+    cvec.vec = arg->val;
+    cvec.sizeof_vec = (size_t) arg->len;    
     if (puzzle_compress_cvec(context, &compressed_cvec, &cvec) != 0) {
         puzzle_free_compressed_cvec(context, &compressed_cvec);
         cvec.vec = NULL;
@@ -169,7 +171,7 @@ PHP_FUNCTION(puzzle_compress_cvec)
         RETURN_FALSE;
     }
     RETVAL_STRINGL(compressed_cvec.vec,
-                   compressed_cvec.sizeof_compressed_vec, 1);
+                   compressed_cvec.sizeof_compressed_vec);
     puzzle_free_compressed_cvec(context, &compressed_cvec);
     cvec.vec = NULL;
     puzzle_free_cvec(context, &cvec);    
@@ -180,29 +182,29 @@ PHP_FUNCTION(puzzle_compress_cvec)
  * Uncompress a compressed signature so that it can be used for computations */
 PHP_FUNCTION(puzzle_uncompress_cvec)
 {    
-    char *arg = NULL;
-    int arg_len;
+    zend_string *arg;
+
     PuzzleContext *context;
     PuzzleCompressedCvec compressed_cvec;
     PuzzleCvec cvec;
     
     context = &LIBPUZZLE_G(global_context);
     if (zend_parse_parameters(ZEND_NUM_ARGS() TSRMLS_CC,
-                              "s", &arg, &arg_len) == FAILURE ||
-        arg_len <= 0) {
+                              "S", &arg) == FAILURE ||
+        arg->len <= 0) {
         RETURN_FALSE;
     }
     puzzle_init_compressed_cvec(context, &compressed_cvec);
     puzzle_init_cvec(context, &cvec);
-    compressed_cvec.vec = arg;
-    compressed_cvec.sizeof_compressed_vec = (size_t) arg_len;    
+    compressed_cvec.vec = arg->val;
+    compressed_cvec.sizeof_compressed_vec = (size_t) arg->len;    
     if (puzzle_uncompress_cvec(context, &compressed_cvec, &cvec) != 0) {
         puzzle_free_cvec(context, &cvec);
         compressed_cvec.vec = NULL;
         puzzle_free_compressed_cvec(context, &compressed_cvec);
         RETURN_FALSE;
     }
-    RETVAL_STRINGL(cvec.vec, cvec.sizeof_vec, 1);
+    RETVAL_STRINGL(cvec.vec, cvec.sizeof_vec);
     puzzle_free_cvec(context, &cvec);
     compressed_cvec.vec = NULL;
     puzzle_free_compressed_cvec(context, &compressed_cvec);    
@@ -213,8 +215,7 @@ PHP_FUNCTION(puzzle_uncompress_cvec)
  * Computes the distance between two signatures. Result is between 0.0 and 1.0 */
 PHP_FUNCTION(puzzle_vector_normalized_distance)
 {    
-    char *vec1 = NULL, *vec2 = NULL;
-    int vec1_len, vec2_len;
+    zend_string *vec1, *vec2;
     PuzzleContext *context;
     PuzzleCvec cvec1, cvec2;
     double d;
@@ -222,9 +223,9 @@ PHP_FUNCTION(puzzle_vector_normalized_distance)
     
     context = &LIBPUZZLE_G(global_context);
     if (zend_parse_parameters
-        (ZEND_NUM_ARGS() TSRMLS_CC, "ss|b",
-         &vec1, &vec1_len, &vec2, &vec2_len, &fix_for_texts) == FAILURE ||
-        vec1_len <= 0 || vec2_len <= 0) {
+        (ZEND_NUM_ARGS() TSRMLS_CC, "SS|b",
+         &vec1, &vec2, &fix_for_texts) == FAILURE ||
+        vec1->len <= 0 || vec2->len <= 0) {
         RETURN_FALSE;
     }
     if (ZEND_NUM_ARGS() TSRMLS_CC < 3) {
@@ -232,10 +233,10 @@ PHP_FUNCTION(puzzle_vector_normalized_distance)
     }
     puzzle_init_cvec(context, &cvec1);
     puzzle_init_cvec(context, &cvec2);    
-    cvec1.vec = vec1;
-    cvec1.sizeof_vec = (size_t) vec1_len;
-    cvec2.vec = vec2;
-    cvec2.sizeof_vec = (size_t) vec2_len;
+    cvec1.vec = vec1->val;
+    cvec1.sizeof_vec = (size_t) vec1->len;
+    cvec2.vec = vec2->val;
+    cvec2.sizeof_vec = (size_t) vec2->len;
     d = puzzle_vector_normalized_distance(context, &cvec1, &cvec2,
                                           (int) fix_for_texts);
     cvec1.vec = cvec2.vec = NULL;
