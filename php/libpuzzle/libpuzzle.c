@@ -126,7 +126,7 @@ PHP_FUNCTION(puzzle_fill_cvec_from_file)
     PuzzleCvec cvec;
     
     context = &LIBPUZZLE_G(global_context);
-    if (zend_parse_parameters(ZEND_NUM_ARGS() TSRMLS_CC,
+    if (zend_parse_parameters(ZEND_NUM_ARGS(),
                               "S", &arg) == FAILURE ||
         arg->len <= 0) {
         RETURN_FALSE;
@@ -155,7 +155,7 @@ PHP_FUNCTION(puzzle_compress_cvec)
     PuzzleCvec cvec;
     
     context = &LIBPUZZLE_G(global_context);
-    if (zend_parse_parameters(ZEND_NUM_ARGS() TSRMLS_CC,
+    if (zend_parse_parameters(ZEND_NUM_ARGS(),
                               "S", &arg) == FAILURE ||
         arg->len <= 0) {
         RETURN_FALSE;
@@ -189,7 +189,7 @@ PHP_FUNCTION(puzzle_uncompress_cvec)
     PuzzleCvec cvec;
     
     context = &LIBPUZZLE_G(global_context);
-    if (zend_parse_parameters(ZEND_NUM_ARGS() TSRMLS_CC,
+    if (zend_parse_parameters(ZEND_NUM_ARGS(),
                               "S", &arg) == FAILURE ||
         arg->len <= 0) {
         RETURN_FALSE;
@@ -223,12 +223,12 @@ PHP_FUNCTION(puzzle_vector_normalized_distance)
     
     context = &LIBPUZZLE_G(global_context);
     if (zend_parse_parameters
-        (ZEND_NUM_ARGS() TSRMLS_CC, "SS|b",
+        (ZEND_NUM_ARGS(), "SS|b",
          &vec1, &vec2, &fix_for_texts) == FAILURE ||
         vec1->len <= 0 || vec2->len <= 0) {
         RETURN_FALSE;
     }
-    if (ZEND_NUM_ARGS() TSRMLS_CC < 3) {
+    if (ZEND_NUM_ARGS() < 3) {
         fix_for_texts = (zend_bool) 1;
     }
     puzzle_init_cvec(context, &cvec1);
@@ -255,7 +255,7 @@ PHP_FUNCTION(puzzle_set_max_width)
     
     context = &LIBPUZZLE_G(global_context);
     if (zend_parse_parameters
-        (ZEND_NUM_ARGS() TSRMLS_CC, "l", &width) == FAILURE ||
+        (ZEND_NUM_ARGS(), "l", &width) == FAILURE ||
         width <= 0L || width > INT_MAX) {
         RETURN_FALSE;
     }
@@ -275,7 +275,7 @@ PHP_FUNCTION(puzzle_set_max_height)
     
     context = &LIBPUZZLE_G(global_context);
     if (zend_parse_parameters
-        (ZEND_NUM_ARGS() TSRMLS_CC, "l", &height) == FAILURE ||
+        (ZEND_NUM_ARGS(), "l", &height) == FAILURE ||
         height <= 0L || height > INT_MAX) {
         RETURN_FALSE;
     }
@@ -295,7 +295,7 @@ PHP_FUNCTION(puzzle_set_lambdas)
     
     context = &LIBPUZZLE_G(global_context);
     if (zend_parse_parameters
-        (ZEND_NUM_ARGS() TSRMLS_CC, "l", &lambdas) == FAILURE ||
+        (ZEND_NUM_ARGS(), "l", &lambdas) == FAILURE ||
         lambdas <= 0L || lambdas > INT_MAX) {
         RETURN_FALSE;
     }
@@ -315,7 +315,7 @@ PHP_FUNCTION(puzzle_set_noise_cutoff)
     
     context = &LIBPUZZLE_G(global_context);
     if (zend_parse_parameters
-        (ZEND_NUM_ARGS() TSRMLS_CC, "d", &cutoff) == FAILURE) {
+        (ZEND_NUM_ARGS(), "d", &cutoff) == FAILURE) {
         RETURN_FALSE;
     }
     if (puzzle_set_noise_cutoff(context, cutoff) != 0) {
@@ -334,7 +334,7 @@ PHP_FUNCTION(puzzle_set_p_ratio)
     
     context = &LIBPUZZLE_G(global_context);
     if (zend_parse_parameters
-        (ZEND_NUM_ARGS() TSRMLS_CC, "d", &p_ratio) == FAILURE) {
+        (ZEND_NUM_ARGS(), "d", &p_ratio) == FAILURE) {
         RETURN_FALSE;
     }
     if (puzzle_set_p_ratio(context, p_ratio) != 0) {
@@ -353,7 +353,7 @@ PHP_FUNCTION(puzzle_set_contrast_barrier_for_cropping)
     
     context = &LIBPUZZLE_G(global_context);
     if (zend_parse_parameters
-        (ZEND_NUM_ARGS() TSRMLS_CC, "d", &barrier) == FAILURE) {
+        (ZEND_NUM_ARGS(), "d", &barrier) == FAILURE) {
         RETURN_FALSE;
     }
     if (puzzle_set_contrast_barrier_for_cropping(context, barrier) != 0) {
@@ -372,7 +372,7 @@ PHP_FUNCTION(puzzle_set_max_cropping_ratio)
     
     context = &LIBPUZZLE_G(global_context);
     if (zend_parse_parameters
-        (ZEND_NUM_ARGS() TSRMLS_CC, "d", &ratio) == FAILURE) {
+        (ZEND_NUM_ARGS(), "d", &ratio) == FAILURE) {
         RETURN_FALSE;
     }
     if (puzzle_set_max_cropping_ratio(context, ratio) != 0) {
@@ -391,7 +391,7 @@ PHP_FUNCTION(puzzle_set_autocrop)
     
     context = &LIBPUZZLE_G(global_context);
     if (zend_parse_parameters
-        (ZEND_NUM_ARGS() TSRMLS_CC, "b", &autocrop) == FAILURE) {
+        (ZEND_NUM_ARGS(), "b", &autocrop) == FAILURE) {
         RETURN_FALSE;
     }
     if (puzzle_set_autocrop(context, (int) autocrop) != 0) {
